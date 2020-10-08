@@ -30,7 +30,7 @@ stdenv.mkDerivation rec {
 
   propagatedBuildInputs = [ libelf libglvnd libX11 numactl ];
 
-  prePatch = ''
+  postPatch = ''
     substituteInPlace CMakeLists.txt \
       --replace 'set(ROCCLR_EXPORTS_FILE "''${CMAKE_CURRENT_BINARY_DIR}/amdrocclr_staticTargets.cmake")' \
         'set(ROCCLR_EXPORTS_FILE "''${CMAKE_INSTALL_LIBDIR}/cmake/amdrocclr_staticTargets.cmake")' \
@@ -40,6 +40,12 @@ stdenv.mkDerivation rec {
     substituteInPlace device/comgrctx.cpp \
       --replace "libamd_comgr.so" "${rocm-comgr}/lib/libamd_comgr.so"
   '';
+
+  patches = [
+    ./non-x86.patch
+  ];
+
+  NIX_CFLAGS_COMPILE = [ "-DNO_WARN_X86_INTRINSICS" ];
 
   cmakeFlags = [
     "-DOPENCL_DIR=${rocm-opencl-runtime.src}"
@@ -59,6 +65,6 @@ stdenv.mkDerivation rec {
     # rocclr seems to have some AArch64 ifdefs, but does not seem
     # to be supported yet by the build infrastructure. Recheck in
     # the future.
-    platforms = [ "x86_64-linux" ];
+    platforms = [ "x86_64-linux" "powerpc64le-linux" ];
   };
 }

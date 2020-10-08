@@ -24,6 +24,10 @@ stdenv.mkDerivation rec {
 
   buildInputs = [ numactl ];
 
+  patches = [
+    ./rocm-thunk-power9.patch
+  ];
+
   postInstall = ''
     cp -r $src/include $out
   '';

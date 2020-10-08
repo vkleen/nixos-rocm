@@ -73,6 +73,12 @@ stdenv.mkDerivation rec {
     echo 'add_dependencies(amdocl64 OpenCL)' >> amdocl/CMakeLists.txt
   '';
 
+  NIX_CFLAGS_COMPILE = [ "-DNO_WARN_X86_INTRINSICS" ];
+
+  patches = [
+    ./non-x86.patch
+  ];
+
   meta = with stdenv.lib; {
     description = "OpenCL runtime for AMD GPUs, part of the ROCm stack";
     homepage = "https://github.com/RadeonOpenCompute/ROCm-OpenCL-Runtime";

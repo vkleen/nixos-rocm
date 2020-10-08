@@ -1,4 +1,5 @@
 { stdenv
+, lib
 , fetchFromGitHub
 , addOpenGLRunpath
 , clang-unwrapped
@@ -29,6 +30,15 @@ stdenv.mkDerivation rec {
   cmakeFlags = [
    "-DBITCODE_DIR=${rocm-device-libs}/lib"
    "-DCMAKE_PREFIX_PATH=${rocm-thunk}"
+  ] ++ lib.optional stdenv.isPower9 "-DIMAGE_SUPPORT=off";
+
+  NIX_CFLAGS_COMPILE = [
+    "-DNO_WARN_X86_INTRINSICS"
+    "-Wno-error=attributes"
+  ];
+
+  patches = [
+    ./rocr-power9.patch
   ];
 
   postPatch = ''
